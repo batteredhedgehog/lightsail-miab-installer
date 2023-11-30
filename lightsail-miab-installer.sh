@@ -849,6 +849,7 @@ export PRIMARY_HOSTNAME="$LMIAB_BOX_HOSTNAME"
 export MTA_STS_MODE=enforce
 export EMAIL_ADDR="$LMIAB_ADMIN_EMAIL"
 export EMAIL_PW="$LMIAB_ADMIN_PASSWORD"
+export DEB_PYTHON_INSTALL_LAYOUT='deb'
 
 echo "[LMIAB Init Script]: Creating user and storage directory"
 useradd -m \$STORAGE_USER
