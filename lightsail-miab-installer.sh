@@ -25,7 +25,7 @@ LMIAB_CACHE_DIR="$LMIAB_OUTPUT_DIR/caches"
 [ -z "$LMIAB_PLAN" ] && LMIAB_PLAN="5_usd"
 [ -z "$LMIAB_DEBUG" ] && LMIAB_DEBUG="true"
 [ -z "$LMIAB_IS_RESTORE" ] && LMIAB_IS_RESTORE="no"
-[ -z "$LMIAB_PACKAGE_URL" ] && LMIAB_PACKAGE_URL="https://github.com/mail-in-a-box/mailinabox/archive/8b19d157359e402f751c86f7e0a1276011277648.tar.gz"
+[ -z "$LMIAB_PACKAGE_URL" ] && LMIAB_PACKAGE_URL="https://github.com/mail-in-a-box/mailinabox/archive/refs/tags/v65.tar.gz"
 [ -z "$LMIAB_SMTP_RELAY_ENDPOINT" ] && LMIAB_SMTP_RELAY_ENDPOINT=""
 [ -z "$LMIAB_SMTP_RELAY_PORT" ] && LMIAB_SMTP_RELAY_PORT="587"
 [ -z "$LMIAB_SMTP_RELAY_USER" ] && LMIAB_SMTP_RELAY_USER=""
@@ -80,8 +80,8 @@ Where OPTIONS:
                           An example 'box.example.com'.
   --installation-id ID    Installation identifier by ID, e.g 'demo'.
   --instance-type TYPE    Amazon Lightsail plan specified by TYPE. Valid value:
-                          '5_usd', '10_usd', '20_usd', '40_usd', '80_usd', or 
-                          '160_usd'. Default is '5_usd'.
+                          '5_usd', '10_usd', '20_usd', '40_usd', '80_usd', 
+			  or '160_usd'. Default is '5_usd'.
   --password PASSWD       Mail-in-a-Box administrator password specified by 
                           PASSWD.
   --restore               Restore installation data from backup which stored on
@@ -231,12 +231,12 @@ lmiab_get_bundle_ids()
 {
   cat <<EOF
 {
-  "5_usd": "micro_2_0",
-  "10_usd": "small_2_0",
-  "20_usd": "medium_2_0",
-  "40_usd": "large_2_0",
-  "80_usd": "xlarge_2_0",
-  "160_usd": "2xlarge_2_0"
+  "5_usd": "micro_3_2",
+  "10_usd": "small_3_2",
+  "20_usd": "medium_3_2",
+  "40_usd": "large_3_2",
+  "80_usd": "xlarge_3_2",
+  "160_usd": "2xlarge_3_2"
 }
 EOF
 }
@@ -551,13 +551,13 @@ $_NETWORKING_RULES
     Properties:
       UserName: !Ref ${_RESOURCE_NAME}SesUser
       Status: Active
-  ${_RESOURCE_NAME}SesIdentity:
-    Type: AWS::SES::EmailIdentity
-    DeletionPolicy: Retain
-    Properties:
-      EmailIdentity: $LMIAB_EMAIL_DOMAIN
-      DkimAttributes: 
-        SigningEnabled: true
+  # ${_RESOURCE_NAME}SesIdentity:
+  #   Type: AWS::SES::EmailIdentity
+  #   DeletionPolicy: Retain
+  #   Properties:
+  #     EmailIdentity: $LMIAB_EMAIL_DOMAIN
+  #     DkimAttributes: 
+  #       SigningEnabled: true
   ${_RESOURCE_NAME}AdminPasswordSsm:
     Type: AWS::SSM::Parameter
     Properties:
@@ -600,7 +600,7 @@ Outputs:
     Value: !Ref $_RESOURCE_NAME
   LightsailInstanceUrl:
     Value: !Sub
-      - 'https://lightsail.aws.amazon.com/ls/webapp/\${AWS::Region}/instances/\${INSTANCE_NAME}/connect'
+      - 'https://lightsail.aws.amazon.com/ls/webapp/\${REGION}/instances/\${INSTANCE_NAME}/connect'
       - REGION: !Ref AWS::Region
         INSTANCE_NAME: !Ref $_RESOURCE_NAME
   LightsailIP:
@@ -628,8 +628,8 @@ Outputs:
       - 'https://s3.console.aws.amazon.com/s3/buckets/\${BUCKET_NAME}?region=\${REGION}&tab=objects'
       - BUCKET_NAME: !Ref ${_RESOURCE_NAME}NextCloudBackup
         REGION: !Ref AWS::Region
-  SesIdentity:
-    Value: !Ref ${_RESOURCE_NAME}SesIdentity
+  # SesIdentity:
+  #   Value: !Ref ${_RESOURCE_NAME}SesIdentity
   SesIdentityUrl:
     Value: !Sub
       - 'https://console.aws.amazon.com/ses/home?region=\${REGION}#/verified-identities/\${DOMAIN}'
@@ -1369,9 +1369,9 @@ lmiab_destroy_all_resources()
   lmiab_log "Deleting Lightsail static IP '$_LIGHTSAIL_STATIC_IP'..."
   aws lightsail release-static-ip --static-ip-name $_LIGHTSAIL_STATIC_IP >> $LMIAB_LOG_FILE
   
-  local _SES_IDENTITY="$( echo "$_RESOURCE_LIST" | grep 'SesIdentity\s' | awk '{print $2}' )"
-  lmiab_log "Deleting SES Identity '$_SES_IDENTITY'..."
-  aws ses delete-identity --identity $_SES_IDENTITY >> $LMIAB_LOG_FILE
+#  local _SES_IDENTITY="$( echo "$_RESOURCE_LIST" | grep 'SesIdentity\s' | awk '{print $2}' )"
+#  lmiab_log "Deleting SES Identity '$_SES_IDENTITY'..."
+#  aws ses delete-identity --identity $_SES_IDENTITY >> $LMIAB_LOG_FILE
   
   return 0
 }
