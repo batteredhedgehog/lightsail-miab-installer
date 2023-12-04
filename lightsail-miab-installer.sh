@@ -25,7 +25,8 @@ LMIAB_CACHE_DIR="$LMIAB_OUTPUT_DIR/caches"
 [ -z "$LMIAB_PLAN" ] && LMIAB_PLAN="5_usd"
 [ -z "$LMIAB_DEBUG" ] && LMIAB_DEBUG="true"
 [ -z "$LMIAB_IS_RESTORE" ] && LMIAB_IS_RESTORE="no"
-[ -z "$LMIAB_PACKAGE_URL" ] && LMIAB_PACKAGE_URL="https://github.com/mail-in-a-box/mailinabox/archive/refs/tags/v65.tar.gz"
+[ -z "$LMIAB_PACKAGE_URL" ] && LMIAB_PACKAGE_URL="https://github.com/mail-in-a-box/mailinabox"
+[ -z "$LMIAB_PACKAGE_TAG" ] && LMIAB_PACKAGE_TAG="v65"
 [ -z "$LMIAB_SMTP_RELAY_ENDPOINT" ] && LMIAB_SMTP_RELAY_ENDPOINT=""
 [ -z "$LMIAB_SMTP_RELAY_PORT" ] && LMIAB_SMTP_RELAY_PORT="587"
 [ -z "$LMIAB_SMTP_RELAY_USER" ] && LMIAB_SMTP_RELAY_USER=""
@@ -47,7 +48,7 @@ LMIAB_NODE_OS_ID="ubuntu_22_04"
 LMIAB_OS_USERNAME="ubuntu"
 
 # Required tools to perform tasks
-LMIAB_REQUIRED_TOOLS="awk aws base64 cat cut date jq openssl sed ssh tee tr wc"
+LMIAB_REQUIRED_TOOLS="git awk aws base64 cat cut date jq openssl sed ssh tee tr wc"
 
 # WARNING! Undocumented flag for destroying all resources
 # Only can be activated by --destroy-all-resources flag
@@ -858,9 +859,12 @@ mkdir -p \$STORAGE_ROOT
 rm /tmp/mail-in-a-box.tar.gz 2>/dev/null
 mkdir -p /opt/mailinabox
 
-echo "[LMIAB Init Script]: Downloading Mail-in-a-Box from $LMIAB_PACKAGE_URL"
-curl -s -L "$LMIAB_PACKAGE_URL" -o /tmp/mail-in-a-box.tar.gz && \
-  tar xf /tmp/mail-in-a-box.tar.gz --strip-components=1 -C /opt/mailinabox
+echo "[LMIAB Init Script]: cloning Mail-in-a-Box tag $LMIAB_PACKAGE_TAG from $LMIAB_PACKAGE_URL"
+git clone -b $LMIAB_PACKAGE_TAG --depth 1 https://github.com/mail-in-a-box/mailinabox /opt/mailinabox < /dev/null 2> /dev/null
+
+#echo "[LMIAB Init Script]: Downloading Mail-in-a-Box from $LMIAB_PACKAGE_URL"
+#curl -s -L "$LMIAB_PACKAGE_URL" -o /tmp/mail-in-a-box.tar.gz && \
+#  tar xf /tmp/mail-in-a-box.tar.gz --strip-components=1 -C /opt/mailinabox
 
 # Write hostname and it's associate public IP address to /etc/hosts. So
 # it can be resolved without having to rely on DNS server. Some tools such as
